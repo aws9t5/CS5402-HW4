@@ -1,6 +1,9 @@
 ---
 title: "1R Mammals Report"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -24,7 +27,7 @@ library(rpart.plot)
                
 **Course:** CS 5402
 
-**Date:**  02-14-2020
+**Date:**  02-25-2020
 
 ## Concept Description:
 Train a system from existing data to classify animals as amphibian, anthropod, bird, fish,
