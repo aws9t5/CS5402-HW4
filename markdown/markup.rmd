@@ -1,0 +1,267 @@
+---
+title: "1R Mammals Report"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
+library(tidyverse)
+library(OneR)
+
+# included for confusion matrix
+library(caret)
+library(e1071)
+
+#used for id3
+library(rpart)
+library(rpart.plot)
+```
+
+**Name:**   Austin Sampson
+
+**eMail:** aws9t5@mst.edu
+               
+**Course:** CS 5402
+
+**Date:**  02-14-2020
+
+## Concept Description:
+Train a system from existing data to classify animals as amphibian, anthropod, bird, fish,
+insect, mammal or reptile. Calssification will be done through Naive Classification and ID3
+and model will be selected after comparing their respective accuracy and error rates to present 
+to the empoloyer.
+
+## Data Collection:
+Data has been provided from the client based off the observation of their feild agents.
+The training and test data sets provided by the client are tranimal-taxonomy-train.csv and
+animal-taxonomy-test.csv respectivly.
+
+## Example Description:
+
+**animal.name**
+
+nominal attribute name of the animal or species
+This attribute was removed from the training and test data sets to prevent overfitting
+
+**hair**
+
+Nominal boolean attribute that displays output as:
+True
+False
+
+**feathers**
+
+Nominal boolean attribute that displays output as:
+True
+False
+
+**eggs**
+
+Nominal boolean attribute that displays output as:
+True
+False
+
+**milk**
+
+Nominal boolean attribute that displays output as:
+True
+False
+
+**airborne**
+
+Nominal boolean attribute that displays output as:
+True
+False
+
+**aquatic**
+
+Nominal boolean attribute that displays output as:
+True
+False
+
+**preditor**
+
+Nominal boolean attribute that displays output as:
+True
+False
+
+**toothed**
+
+Nominal boolean attribute that displays output as:
+True
+False
+
+**backbone**
+
+Nominal boolean attribute that displays output as:
+True
+False
+
+**breathes**
+
+Nominal boolean attribute that displays output as:
+True
+False
+
+**venomous**
+
+Nominal boolean attribute that displays output as:
+True
+False
+
+**fins**
+
+Nominal boolean attribute that displays output as:
+True
+False
+
+**legs**
+
+Ratio Lable displaying the number of legs. null value or 0
+indicates the absince of legs.
+This data was filtered out of the test and training data due
+to containing zero values.
+
+**tail**
+
+Nominal boolean attribute that displays output as:
+True
+False
+
+**domestic**
+
+Nominal boolean attribute that displays output as:
+True
+False
+
+**catsize**
+
+Nominal boolean attribute that displays output as:
+True
+False
+
+**gestation**
+
+Interval attribute displays a measure of time it took for the gestation of a species.
+this data was removed from the training and test data sets do to missing values.
+
+**type**
+
+Nominal, Main classificationn variable for this data set. Output displayed as:
+mammal
+fish
+arthropod
+bird
+insect
+amphibian
+reptile
+
+## Data Import and Wrangling:
+
+Importing test and training data
+```{r}
+#import main file
+train <- read.csv("animal-taxonomy-train.csv")
+test <- read.csv("animal-taxonomy-test.csv")
+
+```
+We remove the name attribute to prevent the moddel from overfitting by training for name attributes.
+We also set the legs and gestation attributes to null do to missing and zero values.
+```{R}
+#remove the name attribute from the test and training data
+
+train$animal.name <- NULL
+test$animal.name <- NULL
+train$gestation <- NULL
+test$gestation <- NULL
+train$legs <- NULL
+train$legs <- NULL
+
+```
+
+## Mining and Analytics:
+
+**Naive Bayes Classifiers**
+
+Traing the Confusion Matrix for bayes classification
+```{r}
+train.nb <- naiveBayes(type ~ ., data=train)
+train.nb
+```
+
+
+**ID3**
+
+To train the ID3 Classifier I untailzied the rpart package and their graphing tools
+```{r}
+#train the id3 model using the rpart library
+model.id3 <-rpart(type ~., data = train)
+rpart.plot(model.id3)
+```
+
+
+## Evaluation:
+
+**ID3**
+Calculating the Confusion matrix for ID3 decision tree classification
+Using the model create a prediction for the dataset and compare it to the actual
+
+```{r}
+#predict classification using id3 model
+pred.id3 <- predict(model.id3, test,type="class")
+#print the generated classification decision tree
+
+#Calculated the confusion matrix based off the prediction
+pred.id3 <- droplevels(pred.id3)
+confusionMatrix(pred.id3,test$type)
+```
+
+
+
+**Bayes**
+Calculating confusion matrix for Bayes
+I had re-added the levels that where missing from both tables in order to calculate the confusion
+matrix. 
+```{r}
+m_predictions <- predict(train.nb, test)
+
+#table(m_predictions);
+#table(test);
+
+
+m_predictions <- droplevels(m_predictions)
+cfm <- confusionMatrix(m_predictions, test$type)
+cfm
+
+```
+
+**Accuracy and Error Rates**
+
+As can be shown above due to both the bayes and ID3 algorithm generating
+accuracies of 1, we know both models have an error rate of 0%.
+
+
+**ID3**
+
+## Results
+
+Since both the generated classification modesl produced a 100% accuracy rating
+from their confusion matrixes based off our test data and therefore had error
+rates of 0%. We can conclude that both the Naive Bayes and ID3 models are equivalent
+in their ability to produce accurate and relaible results for the classification of our data.
+
+Out of the two models examened I would recomend presenting the ID3 model to the client due to
+its ease of use and graphical representation. Another reason to choose ID3 would be because
+it does not operate under the assumption that all the data attributes are independent Like Naive Bayes.
+
+
+## References:
+https://www.rdocumentation.org/packages/caret/versions/3.45/topics/confusionMatrix
+https://www.rdocumentation.org/packages/utils/versions/3.6.2/topics/data
+http://www.learnbymarketing.com/tutorials/naive-bayes-in-r/
+https://www.rdocumentation.org/packages/rpart/versions/4.1-15/topics/rpart
+http://www.milbo.org/rpart-plot/prp.pdf
+
+
+
